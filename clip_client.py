@@ -105,9 +105,9 @@ if __name__ == "__main__":
                         default=False,
                         help='Enable verbose output')
     parser.add_argument("--label_file",
-        		        type=str,
-        		        default="./clip_repository/preprocess/labels.txt",
-        		        help="Path to the file with text representation of available labels")
+                        type=str,
+                        default="./clip_repository/preprocess/labels.txt",
+                        help="Path to the file with text representation of available labels")
         		 
     args = parser.parse_args()
 
