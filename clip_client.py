@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
     # Load text labels
     labels = load_labels(args.label_file)
-    labels_array = np.array(list(labels.values()), dtype=np.object_)
+    labels_array = np.array(list(labels), dtype=np.object_)
     
     # Load image data
     image_data = load_image(args.image)
