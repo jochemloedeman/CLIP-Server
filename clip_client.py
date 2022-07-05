@@ -40,7 +40,7 @@ def load_image(img_path: str) -> np.ndarray:
 
 def load_labels(labels_path: str) -> List[str]:
     """
-    loads the labels contained in the label file into a list of strings
+    Loads the labels contained in the label file into a list of strings
     """
     with open(labels_path) as file:
         lines = file.readlines()
@@ -52,6 +52,9 @@ def generate_inputs(
     labels_array: np.ndarray, 
     image_array: np.ndarray,
 ) -> List[tritonclient.grpc.InferInput]:
+    """
+    Generates inputs from image and label arrays
+    """
     
     inputs = []
 
@@ -67,6 +70,9 @@ def generate_inputs(
 
 
 def print_results(output_data: np.ndarray, labels: List[str]) -> None:
+    """
+    Pretty prints the class-wise probabilities and best match
+    """
     print()
     for idx, label in enumerate(labels):
         print(f"{label: {output_data[idx]:.2f}}")
@@ -112,12 +118,15 @@ if __name__ == "__main__":
         print("channel creation failed: " + str(e))
         sys.exit(1)
 
+    # Load text labels
     labels = load_labels(args.label_file)
     labels_array = np.array(list(labels.values()), dtype=np.object_)
     
+    # Load image data
     image_data = load_image(args.image)
     image_data = np.expand_dims(image_data, axis=0)
 
+    # Create input and output inference objects
     inputs = generate_inputs(labels_array, image_data)
     outputs = [tritonclient.grpc.InferRequestedOutput("OUTPUT")]
     

@@ -24,49 +24,34 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import numpy as np
-import sys
 import json
-import io
-
-# triton_python_backend_utils is available in every Triton Python model. You
-# need to use this module to create inference requests and responses. It also
-# contains some utility functions for extracting information from model_config
-# and converting Triton input/output types to numpy types.
 import torch
 import triton_python_backend_utils as pb_utils
 
-from PIL import Image
-import torchvision.transforms as transforms
-import os
-
 
 class TritonPythonModel:
+    """
+    This model applies a softmax over the logit outputs of the CLIP model
+    """
 
     def initialize(self, args):
 
-        # You must parse model_config. JSON string is not parsed here
         self.model_config = model_config = json.loads(args['model_config'])
 
-        # Get OUTPUT0 configuration
         output0_config = pb_utils.get_output_config_by_name(
             model_config, "OUTPUT_0"
         )
-
-        # Convert Triton types to numpy types
         self.output0_dtype = pb_utils.triton_string_to_numpy(
             output0_config['data_type']
         )
 
     def execute(self, requests):
-
         output0_dtype = self.output0_dtype
-
         responses = []
 
         for request in requests:
-            in_0 = pb_utils.get_input_tensor_by_name(request, "INPUT_0").as_numpy()
-            in_0 = torch.from_numpy(in_0).float()
+            in_0 = pb_utils.get_input_tensor_by_name(request, "INPUT_0")
+            in_0 = torch.from_numpy(in_0.as_numpy()).float()
 
             probs_out = torch.softmax(in_0, dim=-1).squeeze().numpy()
 
@@ -83,8 +68,4 @@ class TritonPythonModel:
         return responses
 
     def finalize(self):
-        """`finalize` is called only once when the model is being unloaded.
-        Implementing `finalize` function is OPTIONAL. This function allows
-        the model to perform any necessary clean ups before exit.
-        """
         print('Cleaning up...')

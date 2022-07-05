@@ -23,6 +23,8 @@
 # OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+from typing import List, Dict
 import numpy as np
 import json
 import io
@@ -33,16 +35,18 @@ import clip
 from PIL import Image
 
 class TritonPythonModel:
+    """
+    This model applies a sequence of torchvision transforms on incoming
+    images, and tokenizes the incoming text.
+    """
 
-    def initialize(self, args):
+    def initialize(self, args: Dict) -> None:
 
-        # You must parse model_config. JSON string is not parsed here
         self.model_config = model_config = json.loads(args['model_config'])
-        # Get OUTPUT0 configuration
+
         output0_config = pb_utils.get_output_config_by_name(
             model_config, "OUTPUT_0"
         )
-
         output1_config = pb_utils.get_output_config_by_name(
             model_config, "OUTPUT_1"
         )
@@ -63,7 +67,14 @@ class TritonPythonModel:
                 )
             ])
 
-    def execute(self, requests):
+    def execute(
+        self, 
+        requests: List[pb_utils.InferenceRequest]
+    ) -> List[pb_utils.InferenceResponse]:
+        """
+        This function is called when an inference is requested
+        for this model
+        """
 
         output0_dtype = self.output0_dtype
         output1_dtype = self.output1_dtype
@@ -74,14 +85,17 @@ class TritonPythonModel:
             in_0 = pb_utils.get_input_tensor_by_name(request, "INPUT_0")
             in_1 = pb_utils.get_input_tensor_by_name(request, "INPUT_1")
 
+            # decode and transform images
             image = in_0.as_numpy()
             image = Image.open(io.BytesIO(image.tobytes()))
             image_out = self._transform_image(image).numpy()
 
+            # decode and tokenized the captions
             captions = in_1.as_numpy().astype(np.object_).tolist()
             captions = [string.decode('UTF-8') for string in captions]
             tokenized_captions = np.array(clip.tokenize(captions))
 
+            # build outputs
             out_tensor_0 = pb_utils.Tensor(
                 "OUTPUT_0",
                 image_out.astype(output0_dtype)
@@ -97,15 +111,10 @@ class TritonPythonModel:
 
         return responses
 
-    def finalize(self):
-        """`finalize` is called only once when the model is being unloaded.
-        Implementing `finalize` function is OPTIONAL. This function allows
-        the model to perform any necessary clean ups before exit.
-        """
+    def finalize(self) -> None:
         print('Cleaning up...')
 
     def _transform_image(self, image_name):
                 image = self.image_transforms(image_name)
-                #expand the dimension to nchw
                 image = image.unsqueeze(0)
                 return image
