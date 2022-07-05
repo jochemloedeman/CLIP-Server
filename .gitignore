@@ -1,0 +1,8 @@
+clip_repository/clip/1/model.pt
+clip_repository/clip/2/model.pt
+clip_repository/postprocess/1/__pycache__/model.cpython-38.pyc
+clip_repository/preprocess/1/__pycache__/model.cpython-38.pyc
+images/car.jpg
+images/mug.jpg
+images/pan.jpg
+clip_repository/preprocess/labels.txt
