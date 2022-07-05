@@ -75,10 +75,10 @@ def print_results(output_data: np.ndarray, labels: List[str]) -> None:
     """
     print()
     for idx, label in enumerate(labels):
-        print(f"{label: {output_data[idx]:.2f}}")
+        print(f"{label}: {output_data[idx]:.2f}")
 
     best_label_index = np.argmax(output_data)
-    print("Best match: {}".format(labels[best_label_index]))
+    print("Best match: {}".format(labels[best_label_index]) + "\n")
 
 
 if __name__ == "__main__":
