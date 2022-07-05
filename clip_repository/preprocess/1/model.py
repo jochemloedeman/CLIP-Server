@@ -115,6 +115,6 @@ class TritonPythonModel:
         print('Cleaning up...')
 
     def _transform_image(self, image_name):
-                image = self.image_transforms(image_name)
-                image = image.unsqueeze(0)
-                return image
+        image = self.image_transforms(image_name)
+        image = image.unsqueeze(0)
+        return image
