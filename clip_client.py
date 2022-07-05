@@ -81,7 +81,6 @@ def print_results(output_data: np.ndarray, labels: List[str]) -> None:
     print("Best match: {}".format(labels[best_label_index]))
 
 
-s
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_name",
