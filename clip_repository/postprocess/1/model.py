@@ -34,7 +34,7 @@ class TritonPythonModel:
     This model applies a softmax over the logit outputs of the CLIP model
     """
 
-    def initialize(self, args):
+    def initialize(self, args: Dict) -> None:
 
         self.model_config = model_config = json.loads(args['model_config'])
 
@@ -45,7 +45,10 @@ class TritonPythonModel:
             output0_config['data_type']
         )
 
-    def execute(self, requests):
+    def execute(
+        self, 
+        requests: List[pb_utils.InferenceRequest]
+    ) -> List[pb_utils.InferenceResponse]:
         output0_dtype = self.output0_dtype
         responses = []
 
@@ -67,5 +70,5 @@ class TritonPythonModel:
 
         return responses
 
-    def finalize(self):
+    def finalize(self) -> None:
         print('Cleaning up...')

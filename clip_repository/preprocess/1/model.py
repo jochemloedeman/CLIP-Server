@@ -28,6 +28,7 @@ from typing import List, Dict
 import numpy as np
 import json
 import io
+import torch
 import triton_python_backend_utils as pb_utils
 import torchvision.transforms as transforms
 import clip
@@ -114,7 +115,7 @@ class TritonPythonModel:
     def finalize(self) -> None:
         print('Cleaning up...')
 
-    def _transform_image(self, image_name):
-        image = self.image_transforms(image_name)
+    def _transform_image(self, image: Image) -> torch.Tensor:
+        image = self.image_transforms(image)
         image = image.unsqueeze(0)
         return image
